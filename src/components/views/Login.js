@@ -3,7 +3,7 @@ import {api, handleError} from 'helpers/api';
 import User from 'models/User';
 import {useHistory} from 'react-router-dom';
 import {Button} from 'components/ui/Button';
-import 'styles/views/Login.scss';
+import 'styles/views/Login.scss'; // Change this?
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
@@ -15,17 +15,17 @@ specific components that belong to the main one in the same file.
  */
 const FormField = props => {
   return (
-    <div className="login field">
-      <label className="login label">
-        {props.label}
-      </label>
-      <input
-        className="login input"
-        placeholder="enter here.."
-        value={props.value}
-        onChange={e => props.onChange(e.target.value)}
-      />
-    </div>
+      <div className="login field">
+        <label className="login label">
+         {props.label}
+        </label>
+        <input
+            className="login input"
+            placeholder="enter here.."
+            value={props.value}
+            onChange={e => props.onChange(e.target.value)}
+        />
+      </div>
   );
 };
 
@@ -37,12 +37,17 @@ FormField.propTypes = {
 
 const Login = props => {
   const history = useHistory();
-  const [name, setName] = useState(null);
-  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [username, setUsername] = useState(null); // array destructuring, username is a state, setUsername is a function
+  // This function allows to change state. We cannot just write: username="Something"
+  // const creation_date = Date();
 
-  const doLogin = async () => {
+  // This function sends info in a json file to an api, waits for a response, after that creates a user and puts
+  // him into a storage
+  // If login is successfull => useHistory hook (adds /game to the history)
+  const doRegister = async () => {
     try {
-      const requestBody = JSON.stringify({username, name});
+      const requestBody = JSON.stringify({username, password});
       const response = await api.post('/users', requestBody);
 
       // Get the returned user and update a new object.
@@ -54,36 +59,67 @@ const Login = props => {
       // Login successfully worked --> navigate to the route /game in the GameRouter
       history.push(`/game`);
     } catch (error) {
-      alert(`Something went wrong during the login: \n${handleError(error)}`);
+      alert(`Something went wrong during registration: \n${handleError(error)}`);
+    }
+  };
+
+  const doLogin = async () => {
+    try {
+      const requestBody = JSON.stringify({username, password});
+      const response = await api.post('/registered', requestBody);
+
+      // Get the returned user and update a new object.
+      const user = new User(response.data);
+
+      // Store the token into the local storage.
+      localStorage.setItem('token', user.token);
+
+      // Login successfully worked --> navigate to the route /game in the GameRouter
+      history.push(`/game`);
+    } catch (error) {
+      alert(`Something went wrong during login: \n${handleError(error)}`);
     }
   };
 
   return (
-    <BaseContainer>
-      <div className="login container">
-        <div className="login form">
-          <FormField
-            label="Username"
-            value={username}
-            onChange={un => setUsername(un)}
-          />
-          <FormField
-            label="Name"
-            value={name}
-            onChange={n => setName(n)}
-          />
-          <div className="login button-container">
-            <Button
-              disabled={!username || !name}
-              width="100%"
-              onClick={() => doLogin()}
-            >
-              Login
-            </Button>
+      <BaseContainer>
+        <div className="login container">
+          <div className="login form">
+
+            <FormField
+                label="Username"
+                value={username}
+                onChange={un => setUsername(un)}
+            />
+
+            <FormField
+                label="Password"
+                value={password}
+                onChange={p => setPassword(p)}
+            />
+
+            <div className="login button-container">
+
+              <Button
+                  disabled={!username || !password}
+                  width="100%"
+                  onClick={() => doRegister()}
+              >
+                Register
+              </Button>
+
+              <Button
+                  disabled={!username || !password}
+                  width="100%"
+                  onClick={() => doLogin()}
+              >
+                Login
+              </Button>
+
+            </div>
           </div>
         </div>
-      </div>
-    </BaseContainer>
+      </BaseContainer>
   );
 };
 

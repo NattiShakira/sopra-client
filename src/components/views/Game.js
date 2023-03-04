@@ -1,23 +1,33 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';  // We could just write import React from..., but we take
+// specific methods from React, that's why we write {useEffect, useState} (it's called destructuring), useState is a HOOK
 import {api, handleError} from 'helpers/api';
 import {Spinner} from 'components/ui/Spinner';
 import {Button} from 'components/ui/Button';
 import {useHistory} from 'react-router-dom';
+import { Link } from "react-router-dom"
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
+import Player from './/Player';
 
-const Player = ({user}) => (
-  <div className="player container">
-    <div className="player username">{user.username}</div>
-    <div className="player name">{user.name}</div>
-    <div className="player id">id: {user.id}</div>
-  </div>
-);
+// const Player = ({user}) => (
+//   <div className="player container">
+//     <div className="player username">{user.username}</div>
+//     <div className="player name">{user.name}</div>
+//     <div className="player id">id: {user.id}</div>
+//   </div>
+// );
 
-Player.propTypes = {
-  user: PropTypes.object
-};
+// const Player = ({user}) => (
+//     <div className="player container">
+//       <div className="player username">{user.username}</div>
+//       <div className="player id">id: {user.id}</div>
+//     </div>
+// );
+//
+// Player.propTypes = {
+//     user: PropTypes.object
+// };
 
 const Game = () => {
   // use react-router-dom's hook to access the history
@@ -28,7 +38,8 @@ const Game = () => {
   // keep its value throughout render cycles.
   // a component can have as many state variables as you like.
   // more information can be found under https://reactjs.org/docs/hooks-state.html
-  const [users, setUsers] = useState(null);
+  const [users, setUsers] = useState(null);  //[users, setUsers] is called array destructuring,
+    // users is a state (null for now), setUsers is a function
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -72,14 +83,20 @@ const Game = () => {
     fetchData();
   }, []);
 
-  let content = <Spinner/>;
+  let content //= <Spinner/>;
 
   if (users) {
+      // Unordered list of users displayed on the dashboard
+    // <Player user={user} key={user.id} creation_date={user.creation_date}/>
     content = (
       <div className="game">
         <ul className="game user-list">
           {users.map(user => (
-            <Player user={user} key={user.id}/>
+              <Link to={`/dashboard/${user.id}`}>
+                <div className="player container">
+                <div className="player username">{user.username}</div>
+                </div>
+              </Link>
           ))}
         </ul>
         <Button
@@ -92,15 +109,18 @@ const Game = () => {
     );
   }
 
+  console.log("Dashboard is loaded")
+
   return (
     <BaseContainer className="game container">
-      <h2>Happy Coding!</h2>
+      <h2>Registered users</h2>
       <p className="game paragraph">
-        Get all users from secure endpoint:
+        Choose a user:
       </p>
       {content}
     </BaseContainer>
   );
+
 }
 
 export default Game;

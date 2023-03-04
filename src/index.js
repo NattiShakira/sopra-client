@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from "react"; // Imported the library itself. Contains Component class and useState function
+import ReactDOM from "react-dom"; // Necessary as it contains a render() function
 import "styles/index.scss";
 import App from "App";
 

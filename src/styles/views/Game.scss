@@ -20,6 +20,9 @@
   &.user-list {
     list-style: none;
     padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
   }
   &.user-item {
     display: flex;

@@ -9,10 +9,12 @@ import AppRouter from "components/routing/routers/AppRouter";
 const App = () => {
   return (
     <div>
-      <Header height="100"/>
+      <Header />
       <AppRouter/>
     </div>
   );
 };
 
 export default App;
+
+

@@ -1,14 +1,11 @@
-import {useEffect, useState} from 'react';  // We could just write import React from..., but we take
+import {useEffect, useState} from 'react'; // We could just write import React from..., but we take
 // specific methods from React, that's why we write {useEffect, useState} (it's called destructuring), useState is a HOOK
 import {api, handleError} from 'helpers/api';
-import {Spinner} from 'components/ui/Spinner';
 import {Button} from 'components/ui/Button';
-import {useHistory} from 'react-router-dom';
-import { Link } from "react-router-dom"
+import {Link, useHistory} from 'react-router-dom';
 import BaseContainer from "components/ui/BaseContainer";
-import PropTypes from "prop-types";
 import "styles/views/Game.scss";
-import Player from './/Player';
+import {format} from "date-fns";
 
 // const Player = ({user}) => (
 //   <div className="player container">
@@ -30,96 +27,114 @@ import Player from './/Player';
 // };
 
 const Game = () => {
-  // use react-router-dom's hook to access the history
-  const history = useHistory();
+    // use react-router-dom's hook to access the history
+    const history = useHistory();
 
-  // define a state variable (using the state hook).
-  // if this variable changes, the component will re-render, but the variable will
-  // keep its value throughout render cycles.
-  // a component can have as many state variables as you like.
-  // more information can be found under https://reactjs.org/docs/hooks-state.html
-  const [users, setUsers] = useState(null);  //[users, setUsers] is called array destructuring,
+    // define a state variable (using the state hook).
+    // if this variable changes, the component will re-render, but the variable will
+    // keep its value throughout render cycles.
+    // a component can have as many state variables as you like.
+    // more information can be found under https://reactjs.org/docs/hooks-state.html
+    const [users, setUsers] = useState(null);  //[users, setUsers] is called array destructuring,
     // users is a state (null for now), setUsers is a function
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    history.push('/login');
-  }
 
-  // the effect hook can be used to react to change in your component.
-  // in this case, the effect hook is only run once, the first time the component is mounted
-  // this can be achieved by leaving the second argument an empty array.
-  // for more information on the effect hook, please see https://reactjs.org/docs/hooks-effect.html
-  useEffect(() => {
-    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
-    async function fetchData() {
-      try {
-        const response = await api.get('/users');
-
-        // delays continuous execution of an async operation for 1 second.
-        // This is just a fake async call, so that the spinner can be displayed
-        // feel free to remove it :)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Get the returned users and update the state.
-        setUsers(response.data);
-
-        // This is just some data for you to see what is available.
-        // Feel free to remove it.
-        console.log('request to:', response.request.responseURL);
-        console.log('status code:', response.status);
-        console.log('status text:', response.statusText);
-        console.log('requested data:', response.data);
-
-        // See here to get more data.
-        console.log(response);
-      } catch (error) {
-        console.error(`Something went wrong while fetching the users: \n${handleError(error)}`);
-        console.error("Details:", error);
-        alert("Something went wrong while fetching the users! See the console for details.");
-      }
+    const updateOfflineStatus = (callback) => {
+        const token = sessionStorage.getItem('token')
+        const currentUser = {...users.find(value => value.token === token)}
+        currentUser.creation_date = format(new Date(currentUser.creation_date), 'dd.MM.yyyy')
+        currentUser.birthday = format(new Date(currentUser.birthday), 'dd.MM.yyyy')
+        currentUser.status = 'OFFLINE'
+        const requestBody = JSON.stringify({...currentUser});
+        api.put(`/users/${currentUser.id}`, requestBody)
+            .then(value => {
+                if (!!callback) {
+                    callback()
+                }
+            });
     }
 
-    fetchData();
-  }, []);
+    const logout = () => {
+        updateOfflineStatus(() => {
+            sessionStorage.removeItem('token');
+            history.push('/login');
+        })
+    }
 
-  let content //= <Spinner/>;
+    // the effect hook can be used to react to change in your component.
+    // in this case, the effect hook is only run once, the first time the component is mounted
+    // this can be achieved by leaving the second argument an empty array.
+    // for more information on the effect hook, please see https://reactjs.org/docs/hooks-effect.html
+    useEffect(() => {
+        // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+        async function fetchData() {
+            try {
+                const response = await api.get('/users');
 
-  if (users) {
-      // Unordered list of users displayed on the dashboard
-    // <Player user={user} key={user.id} creation_date={user.creation_date}/>
-    content = (
-      <div className="game">
-        <ul className="game user-list">
-          {users.map(user => (
-              <Link to={`/dashboard/${user.id}`}>
-                <div className="player container">
-                <div className="player username">{user.username}</div>
-                </div>
-              </Link>
-          ))}
-        </ul>
-        <Button
-          width="100%"
-          onClick={() => logout()}
-        >
-          Logout
-        </Button>
-      </div>
+                // delays continuous execution of an async operation for 1 second.
+                // This is just a fake async call, so that the spinner can be displayed
+                // feel free to remove it :)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Get the returned users and update the state.
+                setUsers(response.data);
+
+                // This is just some data for you to see what is available.
+                // Feel free to remove it.
+                console.log('request to:', response.request.responseURL);
+                console.log('status code:', response.status);
+                console.log('status text:', response.statusText);
+                console.log('requested data:', response.data);
+
+                // See here to get more data.
+                console.log(response);
+            } catch (error) {
+                console.error(`Something went wrong while fetching the users: \n${handleError(error)}`);
+                console.error("Details:", error);
+                alert("Something went wrong while fetching the users! See the console for details.");
+            }
+        }
+
+        fetchData();
+    }, []);
+
+    let content //= <Spinner/>;
+
+    if (users) {
+        // Unordered list of users displayed on the dashboard
+        // <Player user={user} key={user.id} creation_date={user.creation_date}/>
+        content = (
+            <div className="game">
+                <ul className="game user-list">
+                    {users.map(user => (
+                        <Link to={`/game/dashboard/${user.id}`}>
+                            <div className="player container">
+                                <div className="player username">{user.username}</div>
+                            </div>
+                        </Link>
+                    ))}
+                </ul>
+                <Button
+                    width="100%"
+                    onClick={() => logout()}
+                >
+                    Logout
+                </Button>
+            </div>
+        );
+    }
+
+    console.log("Dashboard is loaded")
+
+    return (
+        <BaseContainer className="game container">
+            <h2>Registered users</h2>
+            <p className="game paragraph">
+                Choose a user:
+            </p>
+            {content}
+        </BaseContainer>
     );
-  }
-
-  console.log("Dashboard is loaded")
-
-  return (
-    <BaseContainer className="game container">
-      <h2>Registered users</h2>
-      <p className="game paragraph">
-        Choose a user:
-      </p>
-      {content}
-    </BaseContainer>
-  );
 
 }
 

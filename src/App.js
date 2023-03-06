@@ -1,5 +1,6 @@
 import Header from "components/views/Header";
 import AppRouter from "components/routing/routers/AppRouter";
+import {useEffect} from "react";
 
 /**
  * Happy coding!
@@ -7,12 +8,13 @@ import AppRouter from "components/routing/routers/AppRouter";
  * Overhauled by Kyrill Hux
  */
 const App = () => {
-  return (
-    <div>
-      <Header />
-      <AppRouter/>
-    </div>
-  );
+
+    return (
+        <div>
+            <Header/>
+            <AppRouter/>
+        </div>
+    );
 };
 
 export default App;

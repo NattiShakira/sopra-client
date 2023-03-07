@@ -1,5 +1,10 @@
 @import '../theme';
 
+input[type="date"]::-webkit-clear-button {
+  -webkit-appearance: none;
+  display: none;
+}
+
 .dashboard {
   &.container {
     margin-top: 2em;
@@ -50,5 +55,6 @@
     justify-content: center;
     margin-top: 2em;
     column-gap: 20px;
+    row-gap: 20px;
   }
 }

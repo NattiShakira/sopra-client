@@ -103,8 +103,16 @@ const Dashboard = () => {
         }
     };
 
+    const goDashboard = async () => {
+        try {
+            history.push('/game/dashboard')
+        } catch (error) {
+            alert(`Something went wrong during returning to dashboard: \n${handleError(error)}`);
+        }
+    };
+
     return (
-        <>
+        <div>
             {isLoading ? <Spinner/> :
                 <div className="dashboard container">
                     <div className="dashboard form">
@@ -142,16 +150,16 @@ const Dashboard = () => {
                                 onClick={() => doSave(user)}>
                                 SAVE
                             </Button>
+
+                            <Button width="100%" onClick={() => goDashboard()}>
+                                BACK TO DASHBOARD
+                            </Button>
+
                         </div>
                     </div>
-                    <Link to={`/game/dashboard`}>
-                        <div className="player container">
-                            <div className="player username">BACK TO DASHBOARD</div>
-                        </div>
-                    </Link>
                 </div>
             }
-        </>
+        </div>
     );
 };
 

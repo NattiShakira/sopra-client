@@ -6,7 +6,6 @@ import {Button} from 'components/ui/Button';
 import 'styles/views/Login.scss';
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
-import {format} from "date-fns";
 
 /**
  * It is possible to add multiple components inside a single file,
@@ -61,7 +60,7 @@ const Login = () => {
             // Store the token into the local storage.
             sessionStorage.setItem('token', user.token);
 
-            // Login successfully worked, navigate to the route /game/dashboard.
+            // Registration successfully worked, navigate to the route /game/dashboard.
             history.push(`/game/dashboard`);
         } catch (error) {
             alert(`Something went wrong during registration: \n${handleError(error)}`);
@@ -76,19 +75,11 @@ const Login = () => {
             // Get the returned user and update a new object.
             const user = new User(response.data);
 
-            const currentUser={...user}
-            currentUser.creation_date = format(new Date(currentUser.creation_date), 'dd.MM.yyyy')
-            currentUser.birthday = format(new Date(currentUser.birthday), 'dd.MM.yyyy')
+            // Store the token into the local storage.
+            sessionStorage.setItem('token', user.token);
 
-            const requestBodyUser = JSON.stringify({...currentUser});
-            api.put(`/users/${currentUser.id}`, requestBodyUser)
-                .then(() => {
-                    // Store the token into the local storage.
-                    sessionStorage.setItem('token', user.token);
-
-                    // Login successfully worked, navigate to the route /game/dashboard.
-                    history.push(`/game/dashboard`);
-                });
+            // Login successfully worked, navigate to the route /game/dashboard.
+            history.push(`/game/dashboard`);
 
         } catch (error) {
             alert(`Something went wrong during login: \n${handleError(error)}`);

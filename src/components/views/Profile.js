@@ -83,7 +83,6 @@ const Profile = () => {
 
     const doSave = async (sendUser) => {
         try {
-            // sendUser.creation_date = format(new Date(sendUser.creation_date), 'dd.MM.yyyy')
             sendUser.birthday = format(new Date(sendUser.birthday), 'dd.MM.yyyy')
             const requestBody = JSON.stringify({...sendUser});
             await api.put(`/users/${sendUser.id}`, requestBody);
@@ -135,10 +134,10 @@ const Profile = () => {
                                 disabled={disabled}
                                 width="100%"
                                 onClick={() => doSave(user)}>
-                                SAVE
+                                SAVE CHANGES
                             </Button>
                             <Button width="100%" onClick={() => goDashboard()}>
-                                TO DASHBOARD
+                                GO TO DASHBOARD
                             </Button>
                         </div>
                     </div>
